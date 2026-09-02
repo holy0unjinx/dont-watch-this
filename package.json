@@ -1,0 +1,7 @@
+{
+  "name": "google-wikipedia-clone",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  }
+}
