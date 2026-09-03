@@ -1031,41 +1031,98 @@ button {
   width: 100%;
   margin-top: 6rem;
   height: 100vh;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: hidden;
   background: url("wallpaper.webp") center center / cover no-repeat;
-  scrollbar-width: none;
   /* 실제 Windows 7 UI 폰트: 라틴 문자는 Segoe UI, 한글은 맑은 고딕. */
   font-family: "Segoe UI", "맑은 고딕", "Malgun Gothic", sans-serif;
+  --taskbar-height: 44px;
 }
 
-#windows::-webkit-scrollbar {
-  display: none;
-}
-
-#windows .windows-track {
-  display: flex;
-  align-items: center;
-  gap: 60px;
+/* 창이 절대 배치되는 바탕. 예전엔 가로로 흐르는 갤러리였지만, 최소화·
+   최대화·작업표시줄이 성립하려면 "화면 하나"여야 해서 데스크톱으로 바꿨다. */
+#windows .desktop {
+  position: relative;
+  width: 100%;
   height: 100%;
-  width: max-content;
-  padding: 0 10vw;
 }
+
+/* -- 바탕화면 아이콘 -- */
+
+#windows .desktop-icons {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#windows .desktop-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 74px;
+  padding: 6px 2px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: none;
+  color: #fff;
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.3;
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+  cursor: pointer;
+}
+
+#windows .desktop-icon:hover,
+#windows .desktop-icon:focus-visible {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.08));
+  outline: none;
+}
+
+#windows .desktop-icon-glyph {
+  position: relative;
+  width: 32px;
+  height: 28px;
+  border-radius: 3px 5px 3px 3px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+#windows .desktop-icon-glyph--explorer {
+  background: linear-gradient(180deg, #ffd97a, #f5b942);
+  border: 1px solid #c98f1e;
+}
+
+#windows .desktop-icon-glyph--notepad {
+  background: linear-gradient(180deg, #ffffff, #dfe8f2);
+  border: 1px solid #8fa9bf;
+}
+
+#windows .desktop-icon-glyph--paint {
+  background: linear-gradient(140deg, #ff8a8a 35%, #7ec8f5 35% 65%, #86e0a3 65%);
+  border: 1px solid #7a8fa3;
+}
+
+#windows .desktop-icon-glyph--cpanel {
+  background: radial-gradient(circle at 35% 30%, #e6c8ff, #a066d6 65%, #6b3fa0);
+  border: 1px solid #6b3fa0;
+}
+
+/* -- 창 -- */
 
 /* 실제 Aero 창은 "타이틀바만 색이 다른 판"이 아니라, 프레임 전체가
    유리색(--win7-theme-color)이고 그 안쪽에 흰 본문이 얇은 패딩을 두고
-   앉아있는 구조다. .win7 .window__main / .window__main.active 그대로. */
-/* height를 vh로 따로 주면, 모바일처럼 화면 비율(가로:세로) 자체가
-   데스크톱과 다른 곳에서는 vw(너비)와 vh(높이)가 서로 다른 기준으로
-   늘어나 창 모양이 통째로 비틀린다(가로로 넓던 창이 세로로 길쭉해짐).
-   그래서 높이는 vh 대신 aspect-ratio로 "너비 대비 비율"로 고정한다 —
-   그러면 뷰포트가 뭐든 창의 가로세로 비율 자체는 절대 안 바뀐다. */
+   앉아있는 구조다. 위치와 크기는 window-manager.js가 인라인으로 덮어쓰고,
+   아래 값은 스크립트가 돌기 전(혹은 실패했을 때)의 기본 배치다. */
 #windows .window-card {
-  position: relative;
-  flex-shrink: 0;
-  width: 60vw;
-  max-width: 700px;
-  aspect-ratio: 60 / 56;
+  position: absolute;
   display: flex;
   flex-direction: column;
   padding: 6px;
@@ -1088,8 +1145,78 @@ button {
       rgba(255, 255, 255, 0.33) 70px,
       rgba(255, 255, 255, 0) 100px
     ),
+    var(--win7-theme-color-inactive);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* 활성 창만 유리색이 진하고 그림자가 깊다 — 어느 창을 쓰고 있는지 보이게. */
+#windows .window-card.is-active {
+  background:
+    linear-gradient(
+      rgba(255, 255, 255, 0) 30px,
+      rgba(255, 255, 255, 0.7) 40%,
+      rgba(255, 255, 255, 0) 41%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.33) 70px,
+      rgba(255, 255, 255, 0) 100px
+    ),
+    linear-gradient(
+      225deg,
+      rgba(255, 255, 255, 0.33) 70px,
+      rgba(255, 255, 255, 0) 100px
+    ),
     var(--win7-theme-color);
   box-shadow: 0 22px 46px rgba(0, 0, 0, 0.45);
+}
+
+#windows .window-card.is-maximized {
+  border-radius: 0;
+}
+
+#windows .window-card.is-dragging {
+  /* 드래그 중에는 전환 효과가 커서를 따라오는 걸 방해한다. */
+  transition: none;
+  user-select: none;
+}
+
+#windows .window-card[hidden] {
+  display: none;
+}
+
+/* 스크립트가 없을 때의 기본 자리 — data-x/y/w/h와 같은 값. */
+#windows .window-card--explorer {
+  left: 16%;
+  top: 8%;
+  width: 44%;
+  height: 62%;
+}
+
+#windows .window-card--notepad {
+  left: 4%;
+  top: 16%;
+  width: 26%;
+  height: 34%;
+}
+
+#windows .window-card--paint {
+  left: 54%;
+  top: 34%;
+  width: 38%;
+  height: 52%;
+  --win7-theme-color: rgba(178, 235, 200, 0.65);
+  --win7-theme-color-inactive: rgba(178, 235, 200, 0.3);
+}
+
+#windows .window-card--cpanel {
+  left: 66%;
+  top: 6%;
+  width: 24%;
+  height: 42%;
+  --win7-theme-color: rgba(214, 193, 251, 0.65);
+  --win7-theme-color-inactive: rgba(214, 193, 251, 0.3);
 }
 
 /* 프루티거 에어로 특유의 "젖은 유리" 하이라이트 — 창 위쪽에 걸치는
@@ -1113,61 +1240,186 @@ button {
   z-index: 1;
 }
 
-/* 창마다 크기/세로 위치/비율/유리색을 다르게 줘서 데스크톱에 흩어진
-   느낌 + 프루티거 에어로 특유의 블루/그린/퍼플 색 다양성을 준다. */
-#windows .window-card:nth-child(1) {
-  margin-left: 14vw;
+/* -- 작업표시줄 -- */
+
+#windows .taskbar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--taskbar-height);
+  padding: 0 8px 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.42),
+      rgba(255, 255, 255, 0.08) 45%,
+      rgba(0, 0, 0, 0.1) 46%,
+      rgba(0, 0, 0, 0.22)
+    ),
+    rgba(24, 48, 78, 0.72);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.35);
 }
 
-#windows .window-card:nth-child(2) {
-  width: 34vw;
-  max-width: 400px;
-  aspect-ratio: 34 / 36;
-  align-self: flex-start;
-  margin-top: 4vh;
+#windows .start-orb {
+  flex-shrink: 0;
+  width: 52px;
+  height: 100%;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
 }
 
-#windows .window-card:nth-child(3) {
-  width: 50vw;
-  max-width: 600px;
-  aspect-ratio: 50 / 48;
-  align-self: flex-end;
-  margin-bottom: 6vh;
-  --win7-theme-color: rgba(178, 235, 200, 0.65);
+#windows .start-orb-glyph {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 45%),
+    radial-gradient(circle at 50% 120%, #0b3f7a, rgba(11, 63, 122, 0) 60%),
+    linear-gradient(180deg, #7fc6ff, #1f7ad4 55%, #0d4f9c);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow:
+    0 0 10px rgba(120, 200, 255, 0.55),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.35);
+  transition: filter 0.15s ease;
 }
 
-#windows .window-card:nth-child(4) {
-  width: 30vw;
-  max-width: 340px;
-  aspect-ratio: 30 / 42;
-  align-self: center;
-  margin-top: -3vh;
-  margin-right: 14vw;
-  --win7-theme-color: rgba(214, 193, 251, 0.65);
+#windows .start-orb:hover .start-orb-glyph,
+#windows .start-orb.is-open .start-orb-glyph {
+  filter: brightness(1.25);
 }
 
-/* 모바일은 뷰포트 폭 자체가 좁아서 vw 값이 그대로면 창이 너무 작다.
-   비율(aspect-ratio)은 그대로 두고 너비만 넉넉하게 키운다 — 높이는
-   비율에 맞춰 알아서 따라온다. */
+#windows .taskbar-buttons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+#windows .taskbar-button {
+  max-width: 190px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.06));
+  color: #f2f8ff;
+  font: inherit;
+  font-size: 12px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+}
+
+#windows .taskbar-button:hover {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.14));
+}
+
+/* 활성 창 버튼은 눌린 것처럼 밝게 — 최소화된 창은 평평하게. */
+#windows .taskbar-button.is-active {
+  border-color: rgba(255, 255, 255, 0.6);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(160, 210, 255, 0.28));
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+#windows .taskbar-button.is-minimized {
+  opacity: 0.72;
+}
+
+#windows .taskbar-tray {
+  flex-shrink: 0;
+  padding: 0 10px;
+  border-left: 1px solid rgba(255, 255, 255, 0.25);
+  color: #eef6ff;
+  font-size: 12px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* -- 시작 메뉴 -- */
+
+#windows .start-menu {
+  position: absolute;
+  left: 6px;
+  bottom: calc(var(--taskbar-height) + 4px);
+  z-index: 101;
+  width: 232px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(236, 246, 255, 0.94), rgba(198, 226, 250, 0.92));
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(12px);
+}
+
+#windows .start-menu[hidden] {
+  display: none;
+}
+
+#windows .start-menu-heading {
+  margin: 0 0 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(90, 140, 190, 0.35);
+  color: #1c4a7a;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+#windows .start-menu-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#windows .start-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: none;
+  color: #123;
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+#windows .start-menu-item:hover,
+#windows .start-menu-item:focus-visible {
+  border-color: #3c7fb1;
+  background: linear-gradient(#eaf6fd 45%, #bee6fd 45%, #a7d9f5);
+  outline: none;
+}
+
+#windows .start-menu-item .desktop-icon-glyph {
+  width: 20px;
+  height: 18px;
+}
+
+/* 좁은 화면에서는 아이콘 줄과 창이 서로 밀어내지 않게 조금씩 줄인다. */
 @media screen and (max-width: 768px) {
-  #windows .window-card {
-    width: 90vw;
-    max-width: 90vw;
+  #windows .desktop-icon {
+    width: 60px;
+    font-size: 10px;
   }
 
-  #windows .window-card:nth-child(2) {
-    width: 55vw;
-    max-width: 55vw;
-  }
-
-  #windows .window-card:nth-child(3) {
-    width: 78vw;
-    max-width: 78vw;
-  }
-
-  #windows .window-card:nth-child(4) {
-    width: 48vw;
-    max-width: 48vw;
+  #windows .taskbar-button {
+    max-width: 110px;
+    padding: 6px 8px;
   }
 }
 
@@ -1272,13 +1524,6 @@ button {
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.667);
   font-size: 1.8rem;
   color: #333333;
-}
-
-/* 오류창(창 2)은 실제 대화상자처럼 가로로 짧고 넓게. */
-/* nth-child(2) 쪽 aspect-ratio(34/36)와 명시도가 같아야(클래스 2개)
-   소스 순서상 나중에 오는 이 규칙이 실제로 이긴다. */
-#windows .window-card.window-card--error {
-  aspect-ratio: 34 / 13;
 }
 
 #windows .window-body--error {

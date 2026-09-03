@@ -320,8 +320,42 @@
       </div>
     </section>
     <section id="windows">
-      <div class="windows-track">
-        <div class="window-card">
+      <div class="desktop">
+        <ul class="desktop-icons">
+          <li>
+            <button class="desktop-icon" type="button" data-launch="explorer">
+              <span class="desktop-icon-glyph desktop-icon-glyph--explorer" aria-hidden="true"></span>
+              <span class="desktop-icon-label">문서 탐색기</span>
+            </button>
+          </li>
+          <li>
+            <button class="desktop-icon" type="button" data-launch="notepad">
+              <span class="desktop-icon-glyph desktop-icon-glyph--notepad" aria-hidden="true"></span>
+              <span class="desktop-icon-label">메모장</span>
+            </button>
+          </li>
+          <li>
+            <button class="desktop-icon" type="button" data-launch="paint">
+              <span class="desktop-icon-glyph desktop-icon-glyph--paint" aria-hidden="true"></span>
+              <span class="desktop-icon-label">그림판</span>
+            </button>
+          </li>
+          <li>
+            <button class="desktop-icon" type="button" data-launch="cpanel">
+              <span class="desktop-icon-glyph desktop-icon-glyph--cpanel" aria-hidden="true"></span>
+              <span class="desktop-icon-label">제어판</span>
+            </button>
+          </li>
+        </ul>
+        <div
+          class="window-card window-card--explorer"
+          data-window="explorer"
+          data-title="문서 탐색기"
+          data-x="16%"
+          data-y="8%"
+          data-w="44%"
+          data-h="62%"
+        >
           <div class="window-titlebar">
             <span class="window-title">문서 탐색기</span>
             <div class="window-controls">
@@ -344,7 +378,15 @@
             </div>
           </div>
         </div>
-        <div class="window-card window-card--error">
+        <div
+          class="window-card window-card--error window-card--notepad"
+          data-window="notepad"
+          data-title="메모장"
+          data-x="4%"
+          data-y="16%"
+          data-w="26%"
+          data-h="34%"
+        >
           <div class="window-titlebar">
             <span class="window-title">메모장</span>
             <div class="window-controls">
@@ -392,7 +434,15 @@
             </div>
           </div>
         </div>
-        <div class="window-card">
+        <div
+          class="window-card window-card--paint"
+          data-window="paint"
+          data-title="그림판"
+          data-x="54%"
+          data-y="34%"
+          data-w="38%"
+          data-h="52%"
+        >
           <div class="window-titlebar">
             <span class="window-title">그림판</span>
             <div class="window-controls">
@@ -418,7 +468,15 @@
             </div>
           </div>
         </div>
-        <div class="window-card">
+        <div
+          class="window-card window-card--cpanel"
+          data-window="cpanel"
+          data-title="제어판"
+          data-x="66%"
+          data-y="6%"
+          data-w="24%"
+          data-h="42%"
+        >
           <div class="window-titlebar">
             <span class="window-title">제어판</span>
             <div class="window-controls">
@@ -452,6 +510,50 @@
             </div>
           </div>
         </div>
+        <nav class="start-menu" hidden>
+          <p class="start-menu-heading">프로그램</p>
+          <ul class="start-menu-list">
+            <li>
+              <button class="start-menu-item" type="button" data-launch="explorer">
+                <span class="desktop-icon-glyph desktop-icon-glyph--explorer" aria-hidden="true"></span>
+                문서 탐색기
+              </button>
+            </li>
+            <li>
+              <button class="start-menu-item" type="button" data-launch="notepad">
+                <span class="desktop-icon-glyph desktop-icon-glyph--notepad" aria-hidden="true"></span>
+                메모장
+              </button>
+            </li>
+            <li>
+              <button class="start-menu-item" type="button" data-launch="paint">
+                <span class="desktop-icon-glyph desktop-icon-glyph--paint" aria-hidden="true"></span>
+                그림판
+              </button>
+            </li>
+            <li>
+              <button class="start-menu-item" type="button" data-launch="cpanel">
+                <span class="desktop-icon-glyph desktop-icon-glyph--cpanel" aria-hidden="true"></span>
+                제어판
+              </button>
+            </li>
+          </ul>
+        </nav>
+        <div class="taskbar">
+          <button
+            class="start-orb"
+            type="button"
+            aria-haspopup="menu"
+            aria-expanded="false"
+            aria-label="시작"
+          >
+            <span class="start-orb-glyph" aria-hidden="true"></span>
+          </button>
+          <div class="taskbar-buttons" role="group" aria-label="열린 창"></div>
+          <div class="taskbar-tray">
+            <time class="taskbar-clock"></time>
+          </div>
+        </div>
       </div>
     </section>
     <script src="script.js"></script>
@@ -464,5 +566,6 @@
       }
     </script>
     <script type="module" src="model-viewer.js"></script>
+    <script type="module" src="window-manager.js"></script>
   </body>
 </html>
