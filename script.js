@@ -493,34 +493,3 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (resultMeta) resultMeta.textContent = "";
   }
 });
-
-// #windows: 세로 스크롤(휠)을 가로 스크롤로 바꿔서, 창들이 옆으로
-// 넘어가게 한다. 마우스가 그 위에 있다고 무조건 가로채는 게 아니라,
-// #windows가 뷰포트를 완전히 덮었을 때만(= 그 섹션을 보고 있는 동안만)
-// 동작한다.
-document.addEventListener("DOMContentLoaded", () => {
-  const windowsSection = document.getElementById("windows");
-  if (!windowsSection) return;
-
-  const coversViewport = () => {
-    const rect = windowsSection.getBoundingClientRect();
-    return rect.top <= 1 && rect.bottom >= window.innerHeight - 1;
-  };
-
-  windowsSection.addEventListener(
-    "wheel",
-    (e) => {
-      if (!coversViewport()) return;
-
-      const maxScrollLeft = windowsSection.scrollWidth - windowsSection.clientWidth;
-      const atStart = windowsSection.scrollLeft <= 0;
-      const atEnd = windowsSection.scrollLeft >= maxScrollLeft - 1;
-      // 맨 앞/맨 끝에서 계속 같은 방향으로 스크롤하면 가로채지 않고
-      // 그대로 흘려보내서 페이지가 위/아래로 스크롤될 수 있게 한다.
-      if ((e.deltaY < 0 && atStart) || (e.deltaY > 0 && atEnd)) return;
-      e.preventDefault();
-      windowsSection.scrollLeft += e.deltaY;
-    },
-    { passive: false }
-  );
-});
