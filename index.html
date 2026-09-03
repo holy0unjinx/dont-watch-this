@@ -552,23 +552,18 @@
               </button>
             </div>
           </div>
-          <div class="window-body cpanel-body">
-            <div class="cpanel-item">
-              <span class="cpanel-icon cpanel-icon--user" aria-hidden="true"></span>
-              <span class="cpanel-label">사용자 계정</span>
+          <div class="window-body doom-body">
+            <div class="doom-stage" tabindex="0">
+              <canvas class="doom-canvas" width="640" height="400" aria-label="DOOM"></canvas>
+              <div class="doom-overlay">
+                <p class="doom-status">표시 설정을 여는 중…</p>
+                <button class="win7-btn doom-start" type="button">계속</button>
+              </div>
             </div>
-            <div class="cpanel-item">
-              <span class="cpanel-icon cpanel-icon--network" aria-hidden="true"></span>
-              <span class="cpanel-label">네트워크</span>
-            </div>
-            <div class="cpanel-item">
-              <span class="cpanel-icon cpanel-icon--display" aria-hidden="true"></span>
-              <span class="cpanel-label">디스플레이</span>
-            </div>
-            <div class="cpanel-item">
-              <span class="cpanel-icon cpanel-icon--programs" aria-hidden="true"></span>
-              <span class="cpanel-label">프로그램</span>
-            </div>
+            <p class="doom-hint">
+              방향키 이동 · Ctrl 발사 · Space 문/스위치 · Esc 메뉴 ·
+              캔버스를 클릭하면 키 입력이 들어갑니다
+            </p>
           </div>
         </div>
         <nav class="start-menu" hidden>
@@ -629,5 +624,6 @@
     <script type="module" src="model-viewer.js"></script>
     <script type="module" src="window-manager.js"></script>
     <script type="module" src="paint-app.js"></script>
+    <script type="module" src="doom-app.js"></script>
   </body>
 </html>

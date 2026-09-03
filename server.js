@@ -12,6 +12,9 @@ const MIME = {
   ".css": "text/css; charset=utf-8",
   ".js": "application/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
+  ".mjs": "application/javascript; charset=utf-8",
+  // instantiateStreaming은 MIME이 정확해야 동작한다.
+  ".wasm": "application/wasm",
   ".gif": "image/gif",
   ".png": "image/png",
   ".jpg": "image/jpeg",
