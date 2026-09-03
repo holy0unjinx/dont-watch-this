@@ -458,13 +458,74 @@
             </div>
           </div>
           <div class="window-body paint-body">
-            <div class="paint-canvas"></div>
-            <div class="paint-palette">
-              <span class="swatch swatch--red" aria-hidden="true"></span>
-              <span class="swatch swatch--yellow" aria-hidden="true"></span>
-              <span class="swatch swatch--blue" aria-hidden="true"></span>
-              <span class="swatch swatch--green" aria-hidden="true"></span>
-              <span class="swatch swatch--purple" aria-hidden="true"></span>
+            <canvas class="paint-canvas" aria-label="그림판 캔버스"></canvas>
+            <div class="paint-toolbar">
+              <div class="paint-palette" role="radiogroup" aria-label="색">
+                <button
+                  class="swatch swatch--black"
+                  type="button"
+                  role="radio"
+                  aria-checked="true"
+                  aria-label="검정"
+                  data-color="#1b1b1b"
+                ></button>
+                <button
+                  class="swatch swatch--red"
+                  type="button"
+                  role="radio"
+                  aria-checked="false"
+                  aria-label="빨강"
+                  data-color="#e81123"
+                ></button>
+                <button
+                  class="swatch swatch--yellow"
+                  type="button"
+                  role="radio"
+                  aria-checked="false"
+                  aria-label="노랑"
+                  data-color="#f7c948"
+                ></button>
+                <button
+                  class="swatch swatch--blue"
+                  type="button"
+                  role="radio"
+                  aria-checked="false"
+                  aria-label="파랑"
+                  data-color="#3fa9f5"
+                ></button>
+                <button
+                  class="swatch swatch--green"
+                  type="button"
+                  role="radio"
+                  aria-checked="false"
+                  aria-label="초록"
+                  data-color="#3ec46d"
+                ></button>
+                <button
+                  class="swatch swatch--purple"
+                  type="button"
+                  role="radio"
+                  aria-checked="false"
+                  aria-label="보라"
+                  data-color="#8e44ad"
+                ></button>
+              </div>
+              <div class="paint-sizes" role="radiogroup" aria-label="굵기">
+                <button class="paint-size" type="button" role="radio" aria-checked="false" data-size="2">
+                  <span class="paint-size-dot" style="--dot: 3px" aria-hidden="true"></span>
+                  <span class="sr-only">가늘게</span>
+                </button>
+                <button class="paint-size" type="button" role="radio" aria-checked="true" data-size="6">
+                  <span class="paint-size-dot" style="--dot: 7px" aria-hidden="true"></span>
+                  <span class="sr-only">보통</span>
+                </button>
+                <button class="paint-size" type="button" role="radio" aria-checked="false" data-size="14">
+                  <span class="paint-size-dot" style="--dot: 12px" aria-hidden="true"></span>
+                  <span class="sr-only">굵게</span>
+                </button>
+              </div>
+              <button class="win7-btn paint-eraser" type="button" aria-pressed="false">지우개</button>
+              <button class="win7-btn paint-clear" type="button">전체 지우기</button>
             </div>
           </div>
         </div>
@@ -567,5 +628,6 @@
     </script>
     <script type="module" src="model-viewer.js"></script>
     <script type="module" src="window-manager.js"></script>
+    <script type="module" src="paint-app.js"></script>
   </body>
 </html>
