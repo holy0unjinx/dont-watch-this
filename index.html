@@ -337,25 +337,10 @@
             </div>
           </div>
           <div class="window-body explorer-body">
-            <div class="explorer-sidebar">
-              <div class="explorer-item is-active">즐겨찾기</div>
-              <div class="explorer-item">라이브러리</div>
-              <div class="explorer-item">컴퓨터</div>
-              <div class="explorer-item">네트워크</div>
-            </div>
-            <div class="explorer-main">
-              <div class="explorer-row">
-                <span class="folder-icon" aria-hidden="true"></span>문서
-              </div>
-              <div class="explorer-row">
-                <span class="folder-icon" aria-hidden="true"></span>사진
-              </div>
-              <div class="explorer-row">
-                <span class="folder-icon" aria-hidden="true"></span>음악
-              </div>
-              <div class="explorer-row">
-                <span class="folder-icon" aria-hidden="true"></span>다운로드
-              </div>
+            <div class="explorer-preview">
+              <canvas id="explorer-model-canvas" aria-label="model.obj 3D 미리보기"></canvas>
+              <p class="explorer-preview-status">model.obj 불러오는 중…</p>
+              <p class="explorer-preview-hint">드래그해서 회전</p>
             </div>
           </div>
         </div>
@@ -470,5 +455,14 @@
       </div>
     </section>
     <script src="script.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./vendor/three/three.module.min.js",
+          "three/addons/": "./vendor/three/"
+        }
+      }
+    </script>
+    <script type="module" src="model-viewer.js"></script>
   </body>
 </html>
