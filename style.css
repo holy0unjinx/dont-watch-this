@@ -1654,29 +1654,52 @@ button {
 
 #windows .paint-canvas {
   flex: 1;
+  min-height: 0;
+  width: 100%;
   background-color: #ffffff;
   border: 1px solid #999;
   box-shadow: inset 0 0 0 1px #ffffff;
-  background-image:
-    radial-gradient(circle at 30% 35%, rgba(63, 169, 245, 0.5), transparent 40%),
-    radial-gradient(circle at 65% 60%, rgba(62, 196, 109, 0.45), transparent 35%),
-    radial-gradient(circle at 78% 22%, rgba(232, 17, 35, 0.4), transparent 30%);
+  cursor: crosshair;
+  touch-action: none;
 }
 
-#windows .paint-palette {
+#windows .paint-canvas.is-erasing {
+  cursor: cell;
+}
+
+#windows .paint-toolbar {
   display: flex;
   flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+#windows .paint-palette,
+#windows .paint-sizes {
+  display: flex;
   gap: 6px;
 }
 
 #windows .swatch {
   width: 20px;
   height: 20px;
+  padding: 0;
   border-radius: 3px;
   border: 1px solid rgba(0, 0, 0, 0.3);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  cursor: pointer;
 }
 
+/* 고른 색은 파란 테두리로 눌린 티를 낸다. */
+#windows .swatch.is-selected {
+  outline: 2px solid #3c7fb1;
+  outline-offset: 1px;
+}
+
+#windows .swatch--black {
+  background-color: #1b1b1b;
+}
 #windows .swatch--red {
   background-color: #e81123;
 }
@@ -1691,6 +1714,48 @@ button {
 }
 #windows .swatch--purple {
   background-color: #8e44ad;
+}
+
+#windows .paint-size {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid #8fa9bf;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #ffffff, #e4eefa);
+  cursor: pointer;
+}
+
+#windows .paint-size.is-selected {
+  border-color: #3c7fb1;
+  background: linear-gradient(#eaf6fd 45%, #bee6fd 45%, #a7d9f5);
+}
+
+#windows .paint-size-dot {
+  width: var(--dot, 6px);
+  height: var(--dot, 6px);
+  border-radius: 50%;
+  background: #1b1b1b;
+}
+
+#windows .paint-eraser.is-active {
+  border-color: #3c7fb1;
+  background: linear-gradient(#eaf6fd 45%, #bee6fd 45%, #a7d9f5);
+}
+
+/* 스크린리더 전용 라벨 — 굵기 버튼의 이름을 읽히게 한다. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* -- 창 4: 제어판 -- */
