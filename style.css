@@ -1410,16 +1410,53 @@ button {
   height: 18px;
 }
 
-/* 좁은 화면에서는 아이콘 줄과 창이 서로 밀어내지 않게 조금씩 줄인다. */
+/* 모바일에서는 데스크톱 은유를 포기한다 — 드래그는 스크롤과 싸우고,
+   작업표시줄과 아이콘이 화면을 다 먹는다. window-manager.js도 이 폭에서는
+   아예 동작하지 않으니(DESKTOP_QUERY), 창을 그냥 세로로 쌓아 보여준다. */
 @media screen and (max-width: 768px) {
-  #windows .desktop-icon {
-    width: 60px;
-    font-size: 10px;
+  #windows {
+    height: auto;
+    overflow: visible;
+    padding: 24px 0 32px;
+    background-attachment: fixed;
   }
 
-  #windows .taskbar-button {
-    max-width: 110px;
-    padding: 6px 8px;
+  #windows .desktop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    height: auto;
+  }
+
+  #windows .desktop-icons,
+  #windows .taskbar,
+  #windows .start-menu {
+    display: none;
+  }
+
+  #windows .window-card,
+  #windows .window-card--explorer,
+  #windows .window-card--notepad,
+  #windows .window-card--paint,
+  #windows .window-card--cpanel {
+    position: static;
+    width: 90vw;
+    max-width: 90vw;
+    height: auto;
+    min-height: 320px;
+    /* 모바일에서는 항상 활성 창처럼 진한 유리로 보여준다. */
+    background:
+      linear-gradient(
+        rgba(255, 255, 255, 0) 30px,
+        rgba(255, 255, 255, 0.7) 40%,
+        rgba(255, 255, 255, 0) 41%
+      ),
+      var(--win7-theme-color);
+  }
+
+  #windows .window-card--notepad {
+    min-height: 220px;
   }
 }
 

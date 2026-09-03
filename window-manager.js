@@ -18,6 +18,10 @@ import {
 } from "./window-state.js";
 
 const TASKBAR_HEIGHT = 44;
+// 좁은 화면에서는 창을 끌고 겹치는 은유가 성립하지 않는다(작업표시줄과
+// 바탕화면 아이콘이 화면을 다 먹고, 드래그는 스크롤과 싸운다). 그래서
+// 데스크톱 동작 자체를 끄고 CSS가 카드를 세로로 쌓게 둔다.
+const DESKTOP_QUERY = "(min-width: 769px)";
 
 const section = document.getElementById("windows");
 const desktopEl = section && section.querySelector(".desktop");
@@ -29,6 +33,8 @@ const clockEl = section && section.querySelector(".taskbar-clock");
 const cards = new Map();
 const listeners = new Set();
 let state = null;
+let wired = false;
+let resizeObserver = null;
 
 function desktopSize() {
   return {
@@ -254,9 +260,10 @@ function startClock() {
 
 // 다른 앱 모듈이 쓰는 최소한의 창구.
 export const desktop = {
-  open: (id) => setState(openWindow(state, id)),
-  close: (id) => setState(closeWindow(state, id)),
-  focus: (id) => setState(focusWindow(state, id)),
+  // 모바일에서는 상태가 없다 — 호출은 조용히 무시된다.
+  open: (id) => state && setState(openWindow(state, id)),
+  close: (id) => state && setState(closeWindow(state, id)),
+  focus: (id) => state && setState(focusWindow(state, id)),
   element: (id) => cards.get(id) || null,
   isVisible: (id) => {
     const target = state?.windows?.[id];
@@ -269,19 +276,60 @@ export const desktop = {
   },
 };
 
-function init() {
+function clearInlineLayout() {
+  for (const card of cards.values()) {
+    card.hidden = false;
+    card.classList.remove("is-active", "is-maximized", "is-dragging");
+    card.style.left = "";
+    card.style.top = "";
+    card.style.width = "";
+    card.style.height = "";
+    card.style.zIndex = "";
+  }
+  taskbarButtons.replaceChildren();
+}
+
+function enable() {
   const size = desktopSize();
   state = createDesktop({ desktop: size, windows: readInitialWindows(size) });
-  for (const [id, card] of cards) wireCard(id, card);
-  wireStartMenu();
-  startClock();
+
+  if (!wired) {
+    for (const [id, card] of cards) wireCard(id, card);
+    wireStartMenu();
+    startClock();
+    wired = true;
+  }
+
   render(null);
+  emit(null);
 
-  const onResize = () => setState(resizeDesktop(state, desktopSize()));
-  if (window.ResizeObserver) new ResizeObserver(onResize).observe(desktopEl);
-  else window.addEventListener("resize", onResize);
-
+  if (window.ResizeObserver) {
+    resizeObserver = new ResizeObserver(() => setState(resizeDesktop(state, desktopSize())));
+    resizeObserver.observe(desktopEl);
+  }
   section.classList.add("desktop-ready");
+}
+
+function disable() {
+  resizeObserver?.disconnect();
+  resizeObserver = null;
+  state = null;
+  clearInlineLayout();
+  setStartMenuOpen(false);
+  section.classList.remove("desktop-ready");
+}
+
+function init() {
+  // 카드 목록은 화면 크기와 무관하게 먼저 채워둔다(모바일에서도 정리에 필요).
+  readInitialWindows(desktopSize());
+
+  const query = window.matchMedia(DESKTOP_QUERY);
+  const sync = () => {
+    if (query.matches && !state) enable();
+    else if (!query.matches && state) disable();
+  };
+  sync();
+  query.addEventListener("change", sync);
 }
 
 if (desktopEl && taskbarButtons) init();
