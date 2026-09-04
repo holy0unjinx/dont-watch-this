@@ -74,26 +74,56 @@ export function assignByLuminance(particles, slots) {
   return assignment;
 }
 
-function pairCost(particle, slot) {
-  const dx = particle.x - slot.x;
-  const dy = particle.y - slot.y;
-  return dx * dx + dy * dy;
+// 색이 얼마나 다른지. 채널당 0~1로 맞춰서 공간 거리와 같은 눈금에 둔다.
+export function colorDistance(a, b) {
+  const dr = (a.r - b.r) / 255;
+  const dg = (a.g - b.g) / 255;
+  const db = (a.b - b.b) / 255;
+  return (dr * dr + dg * dg + db * db) / 3;
 }
 
-// 총 이동 비용(거리 제곱 합). 작을수록 픽셀이 덜 움직인다.
-export function transportCost(particles, slots, assignment) {
+// 한 쌍의 비용 = 이동 거리 + colorWeight × 색 차이.
+// colorWeight를 올리면 "가까운 자리"보다 "어울리는 색 자리"를 우선한다.
+function pairCost(particle, slot, colorWeight) {
+  const dx = particle.x - slot.x;
+  const dy = particle.y - slot.y;
+  const spatial = dx * dx + dy * dy;
+  return colorWeight > 0 ? spatial + colorWeight * colorDistance(particle, slot) : spatial;
+}
+
+// 총 비용. 작을수록 적게 움직이고 색도 잘 맞는다.
+export function transportCost(particles, slots, assignment, { colorWeight = 0 } = {}) {
   let total = 0;
   for (let i = 0; i < particles.length; i++) {
     const slot = slots[assignment[i]];
     if (!slot) continue;
-    total += pairCost(particles[i], slot);
+    total += pairCost(particles[i], slot, colorWeight);
   }
   return total;
 }
 
+// 배정된 자리와 색이 평균적으로 얼마나 어긋났는지(0 = 완벽히 일치).
+export function meanColorMismatch(particles, slots, assignment) {
+  if (particles.length === 0) return 0;
+  let total = 0;
+  let counted = 0;
+  for (let i = 0; i < particles.length; i++) {
+    const slot = slots[assignment[i]];
+    if (!slot) continue;
+    total += colorDistance(particles[i], slot);
+    counted++;
+  }
+  return counted === 0 ? 0 : total / counted;
+}
+
 // 무작위 두 입자의 목적지를 맞바꿔 보고, 총 비용이 줄어들 때만 채택한다.
 // 비용이 늘어나는 교환은 절대 받지 않으므로 호출할수록 단조롭게 좋아진다.
-export function improveAssignment(particles, slots, assignment, { iterations = 4000, random = Math.random } = {}) {
+export function improveAssignment(
+  particles,
+  slots,
+  assignment,
+  { iterations = 4000, random = Math.random, colorWeight = 0 } = {}
+) {
   const count = particles.length;
   if (count < 2 || slots.length === 0) return assignment;
 
@@ -106,8 +136,10 @@ export function improveAssignment(particles, slots, assignment, { iterations = 4
     const slotB = slots[assignment[b]];
     if (!slotA || !slotB) continue;
 
-    const before = pairCost(particles[a], slotA) + pairCost(particles[b], slotB);
-    const after = pairCost(particles[a], slotB) + pairCost(particles[b], slotA);
+    const before =
+      pairCost(particles[a], slotA, colorWeight) + pairCost(particles[b], slotB, colorWeight);
+    const after =
+      pairCost(particles[a], slotB, colorWeight) + pairCost(particles[b], slotA, colorWeight);
     if (after < before) {
       const temp = assignment[a];
       assignment[a] = assignment[b];

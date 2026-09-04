@@ -34,11 +34,17 @@ const TARGET_MAX_LUMINANCE = 0.9;
 const MAX_SLOTS = 9000;
 const MAX_PARTICLES = 9000;
 // 매 프레임 돌리는 교환 개선 횟수. 비용이 절대 늘지 않으므로 계속 좋아진다.
-const IMPROVE_PER_FRAME = 900;
+// 색까지 맞추려면 바꿔볼 쌍이 더 많이 필요해서 넉넉히 잡는다.
+const IMPROVE_PER_FRAME = 2200;
+// 자리를 고를 때 "색이 어울리는가"에 두는 무게. 0이면 이동 거리만 본다.
+// 크게 잡을수록 멀더라도 제 색 자리를 찾아간다.
+const COLOR_WEIGHT = 6;
 // 획을 그은 뒤 배정을 다시 계산하기까지의 여유(ms).
 const REASSIGN_DELAY = 180;
 // 0이면 그린 색을 그대로 둔다 — 자리만 옮겨서 형태로만 사진을 만든다.
 const COLOR_BLEND = 0;
+// 모여드는 속도. 낮출수록 천천히 흐른다.
+const FLOW = { stiffness: 3.4, damping: 0.9, maxSpeed: 0.85, swirl: 1.1, colorBlend: COLOR_BLEND };
 
 const card = document.querySelector('.window-card[data-window="paint"]');
 const canvas = card && card.querySelector(".paint-canvas");
@@ -172,7 +178,10 @@ if (canvas) {
   function reassign() {
     if (!slotsReady || particles.length === 0) return;
     assignment = assignByLuminance(particles, slots);
-    improveAssignment(particles, slots, assignment, { iterations: particles.length * 4 });
+    improveAssignment(particles, slots, assignment, {
+      iterations: particles.length * 6,
+      colorWeight: COLOR_WEIGHT,
+    });
     applyAssignment();
     dirty = false;
   }
@@ -294,12 +303,15 @@ if (canvas) {
     }
     if (slotsReady && particles.length > 0) {
       // 매 프레임 조금씩 더 나은 배정으로 다듬는다.
-      improveAssignment(particles, slots, assignment, { iterations: IMPROVE_PER_FRAME });
+      improveAssignment(particles, slots, assignment, {
+        iterations: IMPROVE_PER_FRAME,
+        colorWeight: COLOR_WEIGHT,
+      });
       applyAssignment();
     }
 
     applySeparation(particles, { dt: Math.min(dt, 1 / 30) });
-    stepParticles(particles, dt, { colorBlend: COLOR_BLEND });
+    stepParticles(particles, dt, FLOW);
     renderParticles();
 
     // 다 모였고 그리는 중도 아니면 루프를 멈춘다.

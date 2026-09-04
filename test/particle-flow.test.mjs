@@ -95,3 +95,28 @@ test("같은 자리에 정확히 겹쳐 있어도 터지지 않는다", () => {
   applySeparation([a, b], { radius: 0.006, strength: 1, dt: 1 / 60 });
   assert.ok(Number.isFinite(a.vx) && Number.isFinite(b.vx));
 });
+
+test("느린 설정으로도 결국 자리에 도착한다", () => {
+  // 그림판이 실제로 쓰는 값. 느리게 흐르되 멈추지는 않아야 한다.
+  const slow = { stiffness: 3.4, damping: 0.9, maxSpeed: 0.85, swirl: 1.1, colorBlend: 0 };
+  const particle = withTarget(
+    createParticle({ x: 0.1, y: 0.9, r: 30, g: 30, b: 30, lum: 0.12 }),
+    0.6,
+    0.4,
+    { r: 240, g: 210, b: 60 }
+  );
+
+  let framesToSettle = 0;
+  for (let i = 0; i < 3000; i++) {
+    stepParticles([particle], 1 / 60, slow);
+    if (particle.settled) {
+      framesToSettle = i;
+      break;
+    }
+  }
+  assert.ok(framesToSettle > 0, "3000프레임 안에 못 멈췄다");
+  // 색은 그대로여야 한다(colorBlend 0).
+  assert.equal(particle.r, 30);
+  assert.equal(particle.g, 30);
+  assert.equal(particle.b, 30);
+});
