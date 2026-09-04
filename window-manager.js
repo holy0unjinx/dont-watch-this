@@ -10,6 +10,7 @@ import {
   toggleMinimize,
   toggleMaximize,
   moveWindow,
+  renameWindow,
   resizeDesktop,
   activeWindowId,
   taskbarItems,
@@ -122,6 +123,9 @@ function render(previous) {
     card.style.width = `${Math.round(target.rect.width)}px`;
     card.style.height = `${Math.round(target.rect.height)}px`;
     card.style.zIndex = String(zIndexOf(state, id));
+
+    const titleEl = card.querySelector(".window-title");
+    if (titleEl && titleEl.textContent !== target.title) titleEl.textContent = target.title;
 
     // 창 크기가 바뀐 프레임에만 알려준다 — 캔버스를 쓰는 앱이 다시 그리도록.
     const before = previous?.windows?.[id];
@@ -264,6 +268,7 @@ export const desktop = {
   open: (id) => state && setState(openWindow(state, id)),
   close: (id) => state && setState(closeWindow(state, id)),
   focus: (id) => state && setState(focusWindow(state, id)),
+  setTitle: (id, title) => state && setState(renameWindow(state, id, title)),
   element: (id) => cards.get(id) || null,
   isVisible: (id) => {
     const target = state?.windows?.[id];

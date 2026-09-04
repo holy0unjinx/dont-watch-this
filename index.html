@@ -377,10 +377,21 @@
             </div>
           </div>
           <div class="window-body explorer-body">
-            <div class="explorer-preview">
-              <canvas id="explorer-model-canvas" aria-label="model.obj 3D 미리보기"></canvas>
-              <p class="explorer-preview-status">model.obj 불러오는 중…</p>
-              <p class="explorer-preview-hint">드래그해서 회전</p>
+            <div class="explorer-sidebar">
+              <div class="explorer-item is-active">즐겨찾기</div>
+              <div class="explorer-item">라이브러리</div>
+              <div class="explorer-item">컴퓨터</div>
+              <div class="explorer-item">네트워크</div>
+            </div>
+            <div class="explorer-main">
+              <p class="explorer-path">라이브러리 › 문서</p>
+              <ul class="explorer-list" role="listbox" aria-label="파일 목록"></ul>
+              <div class="explorer-preview" hidden>
+                <canvas id="explorer-model-canvas" aria-label="model.obj 3D 미리보기"></canvas>
+                <p class="explorer-preview-status"></p>
+                <p class="explorer-preview-hint">드래그해서 회전</p>
+              </div>
+              <p class="explorer-status">파일을 두 번 누르면 열립니다.</p>
             </div>
           </div>
         </div>
@@ -407,36 +418,44 @@
               </button>
             </div>
           </div>
-          <div class="window-body window-body--error">
-            <div class="error-dialog">
-              <div class="error-icon" aria-hidden="true">
-                <svg viewBox="0 0 32 32" width="32" height="32">
-                  <circle cx="16" cy="16" r="15" fill="#cc0000" />
-                  <circle cx="16" cy="16" r="15" fill="url(#errorGlare)" />
-                  <path
-                    d="M11 11l10 10M21 11l-10 10"
-                    stroke="#ffffff"
-                    stroke-width="2.6"
-                    stroke-linecap="round"
-                  />
-                  <defs>
-                    <radialGradient id="errorGlare" cx="35%" cy="25%" r="70%">
-                      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55" />
-                      <stop offset="45%" stop-color="#ffffff" stop-opacity="0.08" />
-                      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
-                    </radialGradient>
-                  </defs>
-                </svg>
-              </div>
-              <div class="error-content">
-                <p class="error-message">
-                  메모장에서 이 파일을 열 수 없습니다.<br />액세스가
-                  거부되었습니다.
-                </p>
-                <div class="error-actions">
-                  <button class="win7-btn" type="button">확인</button>
+          <div class="window-body notepad-body">
+            <div class="notepad-error">
+              <div class="error-dialog">
+                <div class="error-icon" aria-hidden="true">
+                  <svg viewBox="0 0 32 32" width="32" height="32">
+                    <circle cx="16" cy="16" r="15" fill="#d13438" />
+                    <circle cx="16" cy="16" r="15" fill="url(#errorGlare)" />
+                    <path
+                      d="M11 11l10 10M21 11l-10 10"
+                      stroke="#fff"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                    />
+                    <defs>
+                      <radialGradient id="errorGlare" cx="35%" cy="25%" r="70%">
+                        <stop offset="0%" stop-color="#fff" stop-opacity="0.75" />
+                        <stop offset="100%" stop-color="#fff" stop-opacity="0" />
+                      </radialGradient>
+                    </defs>
+                  </svg>
+                </div>
+                <div class="error-content">
+                  <p class="error-message">
+                    메모장에서 이 파일을 열 수 없습니다.<br />액세스가
+                    거부되었습니다.
+                  </p>
+                  <div class="error-actions">
+                    <button class="win7-btn notepad-dismiss" type="button">확인</button>
+                  </div>
                 </div>
               </div>
+            </div>
+            <div class="notepad-doc" hidden>
+              <div class="notepad-menubar" aria-hidden="true">
+                <span>파일</span><span>편집</span><span>서식</span><span>보기</span
+                ><span>도움말</span>
+              </div>
+              <pre class="notepad-text" tabindex="0"></pre>
             </div>
           </div>
         </div>
@@ -667,10 +686,10 @@
         }
       }
     </script>
-    <script type="module" src="model-viewer.js"></script>
     <script type="module" src="window-manager.js"></script>
     <script type="module" src="paint-app.js"></script>
     <script type="module" src="doom-app.js"></script>
     <script type="module" src="minesweeper-ui.js"></script>
+    <script type="module" src="explorer-app.js"></script>
   </body>
 </html>
