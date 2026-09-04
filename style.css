@@ -1990,6 +1990,15 @@ button {
   background: #1b1b1b;
 }
 
+#windows .paint-status {
+  flex-shrink: 0;
+  margin: 0;
+  color: #35566f;
+  font-size: 11px;
+  min-height: 1.2em;
+}
+
+#windows .paint-flow-toggle.is-active,
 #windows .paint-eraser.is-active {
   border-color: #3c7fb1;
   background: linear-gradient(#eaf6fd 45%, #bee6fd 45%, #a7d9f5);
