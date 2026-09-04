@@ -9,6 +9,7 @@ import {
   toggleMinimize,
   toggleMaximize,
   moveWindow,
+  renameWindow,
   resizeDesktop,
   activeWindowId,
   taskbarItems,
@@ -178,4 +179,16 @@ test("없는 창을 건드려도 상태가 그대로다", () => {
   assert.equal(focusWindow(state, "없음"), state);
   assert.equal(closeWindow(state, "없음"), state);
   assert.equal(moveWindow(state, "없음", { x: 0, y: 0 }), state);
+});
+
+test("창 제목을 바꾸면 작업표시줄에도 반영된다", () => {
+  let state = renameWindow(makeState(), "notepad", "01.txt - 메모장");
+  assert.equal(state.windows.notepad.title, "01.txt - 메모장");
+  assert.equal(
+    taskbarItems(state).find((item) => item.id === "notepad").title,
+    "01.txt - 메모장"
+  );
+  // 같은 제목으로 다시 부르면 상태가 그대로다(재렌더 방지).
+  assert.equal(renameWindow(state, "notepad", "01.txt - 메모장"), state);
+  assert.equal(renameWindow(state, "없음", "x"), state);
 });

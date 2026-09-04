@@ -1586,12 +1586,6 @@ button {
   color: #333333;
 }
 
-#windows .window-body--error {
-  align-items: flex-start;
-  justify-content: flex-start;
-  padding: 20px;
-}
-
 #windows .error-dialog {
   display: flex;
   align-items: flex-start;
@@ -1658,12 +1652,245 @@ button {
 }
 
 /* -- 창 1: 문서 탐색기 -- */
-/* 창1은 본문 전체가 3D 뷰어다 — 탐색기 목록 없이 캔버스가 꽉 채운다. */
+/* -- 창 1: 문서 탐색기 -- */
+
 #windows .explorer-body {
   align-items: stretch;
   justify-content: flex-start;
   padding: 0;
   overflow: hidden;
+  font-size: 12px;
+  color: #222;
+}
+
+#windows .explorer-sidebar {
+  flex-shrink: 0;
+  width: 28%;
+  padding: 8px 6px;
+  border-right: 1px solid #b8d6ee;
+  background: linear-gradient(180deg, #f7fbff, #dceefb);
+  font-size: 11px;
+}
+
+#windows .explorer-item {
+  padding: 4px 8px;
+  margin-bottom: 2px;
+  border-radius: 3px;
+  color: #333;
+}
+
+#windows .explorer-item.is-active {
+  border: 1px solid #3c7fb1;
+  background: linear-gradient(#eaf6fd 45%, #bee6fd 45%, #a7d9f5);
+}
+
+#windows .explorer-main {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  padding: 8px;
+  gap: 6px;
+}
+
+#windows .explorer-path {
+  flex-shrink: 0;
+  margin: 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #cfe0ef;
+  color: #35566f;
+  font-size: 11px;
+}
+
+#windows .explorer-list {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+}
+
+#windows .explorer-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 6px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
+}
+
+#windows .explorer-row:hover {
+  border-color: #b7dcf5;
+  background: linear-gradient(#f4fbff, #e2f2fd);
+}
+
+#windows .explorer-row.is-selected {
+  border-color: #3c7fb1;
+  background: linear-gradient(#eaf6fd 45%, #bee6fd 45%, #a7d9f5);
+}
+
+#windows .explorer-icon {
+  position: relative;
+  flex-shrink: 0;
+  width: 14px;
+  height: 16px;
+  border-radius: 2px 4px 2px 2px;
+  border: 1px solid #8fa9bf;
+  background: linear-gradient(160deg, #fdfefe, #dfeaf4 60%, #c3d6e6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* 3D 파일은 종이 위에 와이어프레임 큐브가 얹힌 아이콘. */
+#windows .explorer-icon--model::after {
+  content: "";
+  position: absolute;
+  inset: 3px 2px 4px 2px;
+  border: 1px solid #4f86b8;
+  border-radius: 1px;
+  background:
+    linear-gradient(45deg, transparent 45%, #4f86b8 45%, #4f86b8 55%, transparent 55%),
+    linear-gradient(180deg, rgba(120, 180, 225, 0.55), rgba(120, 180, 225, 0.15));
+}
+
+/* 문서는 줄이 그어진 종이. */
+#windows .explorer-icon--doc::after {
+  content: "";
+  position: absolute;
+  inset: 4px 3px;
+  background:
+    linear-gradient(#8fa9bf 1px, transparent 1px) 0 0 / 100% 4px;
+  opacity: 0.7;
+}
+
+#windows .explorer-preview {
+  position: relative;
+  flex: 1.2;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid #9dbfd8;
+  border-radius: 4px;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg, #eaf5fd, #cfe6f7 70%, #b9d8ef);
+  box-shadow: inset 0 1px 3px rgba(60, 110, 150, 0.35);
+}
+
+#windows .explorer-preview[hidden] {
+  display: none;
+}
+
+#windows .explorer-preview canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+#windows .explorer-preview.is-ready canvas {
+  opacity: 1;
+}
+
+#windows .explorer-preview canvas:active {
+  cursor: grabbing;
+}
+
+#windows .explorer-preview-status,
+#windows .explorer-preview-hint {
+  position: absolute;
+  margin: 0;
+  font-size: 10px;
+  color: #3f6d92;
+  pointer-events: none;
+}
+
+#windows .explorer-preview-status {
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+#windows .explorer-preview-hint {
+  right: 6px;
+  bottom: 4px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#windows .explorer-preview.is-ready .explorer-preview-hint {
+  opacity: 0.75;
+}
+
+#windows .explorer-status {
+  flex-shrink: 0;
+  margin: 0;
+  padding-top: 4px;
+  border-top: 1px solid #cfe0ef;
+  color: #4a6b86;
+  font-size: 11px;
+}
+
+/* -- 창 2: 메모장 -- */
+
+#windows .notepad-body {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: 0;
+  overflow: hidden;
+}
+
+#windows .notepad-error {
+  display: flex;
+  flex: 1;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+#windows .notepad-error[hidden],
+#windows .notepad-doc[hidden] {
+  display: none;
+}
+
+#windows .notepad-doc {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+
+#windows .notepad-menubar {
+  display: flex;
+  flex-shrink: 0;
+  gap: 14px;
+  padding: 3px 8px;
+  border-bottom: 1px solid #d6d6d6;
+  background: #f5f5f5;
+  font-size: 11px;
+  color: #333;
+}
+
+#windows .notepad-text {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 10px 12px;
+  overflow: auto;
+  background: #fff;
+  color: #111;
+  font-family: "Courier New", "맑은 고딕", monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 /* -- 창 3: 그림판 -- */
@@ -1855,66 +2082,6 @@ button {
   text-align: center;
 }
 
-
-/* ── 창 1 본문을 채우는 model.obj 3D 뷰어 ──────────────────────────── */
-
-#windows .explorer-preview {
-  position: relative;
-  flex: 1;
-  min-width: 0;
-  min-height: 0;
-  overflow: hidden;
-  background:
-    radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 60%),
-    linear-gradient(180deg, #eaf5fd, #cfe6f7 70%, #b9d8ef);
-  box-shadow: inset 0 1px 6px rgba(60, 110, 150, 0.3);
-}
-
-#windows .explorer-preview canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-  /* 로드 전에는 캔버스가 비어 있으니 페이드로 등장시킨다. */
-  opacity: 0;
-  transition: opacity 0.45s ease;
-  cursor: grab;
-  touch-action: pan-y;
-}
-
-#windows .explorer-preview.is-ready canvas {
-  opacity: 1;
-}
-
-#windows .explorer-preview canvas:active {
-  cursor: grabbing;
-}
-
-#windows .explorer-preview-status,
-#windows .explorer-preview-hint {
-  position: absolute;
-  margin: 0;
-  font-size: 10px;
-  color: #3f6d92;
-  pointer-events: none;
-}
-
-#windows .explorer-preview-status {
-  inset: 0;
-  display: grid;
-  place-items: center;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
-}
-
-#windows .explorer-preview-hint {
-  right: 6px;
-  bottom: 4px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-#windows .explorer-preview.is-ready .explorer-preview-hint {
-  opacity: 0.75;
-}
 
 
 /* ── 창 5: 지뢰 찾기 ───────────────────────────────────────────────── */

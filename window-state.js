@@ -114,6 +114,14 @@ export function openWindow(state, id) {
   return raise(replaceWindow(state, id, { open: true, minimized: false }), id);
 }
 
+// 창 제목은 바뀔 수 있다 — 메모장이 연 문서 이름을 달고 작업표시줄에도
+// 그대로 반영된다.
+export function renameWindow(state, id, title) {
+  const target = state.windows[id];
+  if (!target || target.title === title) return state;
+  return replaceWindow(state, id, { title });
+}
+
 export function closeWindow(state, id) {
   const target = state.windows[id];
   if (!target || !target.open) return state;
