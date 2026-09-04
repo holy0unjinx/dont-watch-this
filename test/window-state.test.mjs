@@ -10,6 +10,7 @@ import {
   toggleMaximize,
   moveWindow,
   renameWindow,
+  setRect,
   resizeDesktop,
   activeWindowId,
   taskbarItems,
@@ -191,4 +192,22 @@ test("창 제목을 바꾸면 작업표시줄에도 반영된다", () => {
   // 같은 제목으로 다시 부르면 상태가 그대로다(재렌더 방지).
   assert.equal(renameWindow(state, "notepad", "01.txt - 메모장"), state);
   assert.equal(renameWindow(state, "없음", "x"), state);
+});
+
+test("setRect은 최대화를 풀고 데스크톱 안으로 맞춘다", () => {
+  let state = toggleMaximize(makeState(), "paint");
+  state = setRect(state, "paint", { x: 0, y: 0, width: 600, height: 700 });
+  assert.equal(state.windows.paint.maximized, false);
+  assert.deepEqual(state.windows.paint.rect, { x: 0, y: 0, width: 600, height: 700 });
+
+  // 데스크톱보다 큰 사각형은 잘려 들어온다.
+  state = setRect(state, "paint", { x: -50, y: -50, width: 9999, height: 9999 });
+  assert.ok(state.windows.paint.rect.width <= DESKTOP.width);
+  assert.ok(state.windows.paint.rect.y >= 0);
+});
+
+test("스냅 사각형을 그대로 setRect에 넣으면 반쪽 창이 된다", () => {
+  const left = snapRect("left", DESKTOP);
+  const state = setRect(makeState(), "explorer", left);
+  assert.deepEqual(state.windows.explorer.rect, left);
 });
