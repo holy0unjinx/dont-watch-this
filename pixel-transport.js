@@ -14,7 +14,10 @@ export function luminance(r, g, b) {
 
 // 목표 이미지에서 자리 목록을 만든다. 픽셀을 전부 쓰면 너무 많아서 격자로
 // 솎아내고, 투명한 부분은 건너뛴다.
-export function buildTargetSlots({ data, width, height }, { maxSlots = 6000, alphaThreshold = 8 } = {}) {
+export function buildTargetSlots(
+  { data, width, height },
+  { maxSlots = 6000, alphaThreshold = 8, maxLuminance = 1 } = {}
+) {
   const total = width * height;
   const step = Math.max(1, Math.round(Math.sqrt(total / Math.max(1, maxSlots))));
   const slots = [];
@@ -26,6 +29,10 @@ export function buildTargetSlots({ data, width, height }, { maxSlots = 6000, alp
       const r = data[index];
       const g = data[index + 1];
       const b = data[index + 2];
+      const lum = luminance(r, g, b);
+      // 흰 배경처럼 밝기만 높은 부분은 자리에서 빼서, 사진이 네모난 덩어리가
+      // 아니라 피사체 모양으로 드러나게 한다.
+      if (lum > maxLuminance) continue;
       slots.push({
         // 이미지 중앙을 원점(0.5, 0.5)으로 하는 0~1 좌표.
         x: (x + 0.5) / width,
@@ -33,7 +40,7 @@ export function buildTargetSlots({ data, width, height }, { maxSlots = 6000, alp
         r,
         g,
         b,
-        lum: luminance(r, g, b),
+        lum,
       });
     }
   }

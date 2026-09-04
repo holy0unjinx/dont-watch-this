@@ -137,3 +137,16 @@ test("개선을 더 오래 돌리면 결과가 나빠지지 않는다", () => {
     transportCost(particles, slots, long) <= transportCost(particles, slots, short) + 1e-9
   );
 });
+
+test("maxLuminance로 흰 배경을 자리에서 뺀다", () => {
+  const image = splitImage(20, 20); // 왼쪽 검정, 오른쪽 흰색
+  const all = buildTargetSlots(image, { maxSlots: 400 });
+  const noBackground = buildTargetSlots(image, { maxSlots: 400, maxLuminance: 0.92 });
+
+  assert.ok(noBackground.length > 0, "전부 잘려나갔다");
+  assert.ok(noBackground.length < all.length, "밝은 쪽이 그대로 남았다");
+  for (const slot of noBackground) {
+    assert.ok(slot.lum <= 0.92, `밝기 ${slot.lum}인 자리가 남았다`);
+    assert.ok(slot.x < 0.5, "검정 영역(왼쪽)만 남아야 한다");
+  }
+});
