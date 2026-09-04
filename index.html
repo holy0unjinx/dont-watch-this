@@ -341,6 +341,12 @@
             </button>
           </li>
           <li>
+            <button class="desktop-icon" type="button" data-launch="minesweeper">
+              <span class="desktop-icon-glyph desktop-icon-glyph--mine" aria-hidden="true"></span>
+              <span class="desktop-icon-label">지뢰 찾기</span>
+            </button>
+          </li>
+          <li>
             <button class="desktop-icon" type="button" data-launch="cpanel">
               <span class="desktop-icon-glyph desktop-icon-glyph--cpanel" aria-hidden="true"></span>
               <span class="desktop-icon-label">제어판</span>
@@ -566,6 +572,40 @@
             </p>
           </div>
         </div>
+        <div
+          class="window-card window-card--minesweeper"
+          data-window="minesweeper"
+          data-title="지뢰 찾기"
+          data-x="30%"
+          data-y="30%"
+          data-w="20%"
+          data-h="54%"
+        >
+          <div class="window-titlebar">
+            <span class="window-title">지뢰 찾기</span>
+            <div class="window-controls">
+              <button class="win-btn win-minimize" aria-label="최소화">
+                <svg class="win-icon" viewBox="0 0 10 10" width="10" height="10" aria-hidden="true"><line x1="1" y1="8" x2="9" y2="8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" /></svg>
+              </button>
+              <button class="win-btn win-maximize" aria-label="최대화">
+                <svg class="win-icon" viewBox="0 0 10 10" width="10" height="10" aria-hidden="true"><rect x="1" y="1" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.2" /></svg>
+              </button>
+              <button class="win-btn win-close" aria-label="닫기">
+                <svg class="win-icon" viewBox="0 0 10 10" width="10" height="10" aria-hidden="true"><path d="M1 1l8 8M9 1l-8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" /></svg>
+              </button>
+            </div>
+          </div>
+          <div class="window-body mine-body">
+            <div class="mine-hud">
+              <output class="mine-counter" aria-label="남은 지뢰">010</output>
+              <button class="mine-reset" type="button" aria-label="새 게임">
+                <span class="mine-face" aria-hidden="true"></span>
+              </button>
+              <output class="mine-timer" aria-label="경과 시간">000</output>
+            </div>
+            <div class="mine-grid" role="grid" aria-label="지뢰찾기 판"></div>
+          </div>
+        </div>
         <nav class="start-menu" hidden>
           <p class="start-menu-heading">프로그램</p>
           <ul class="start-menu-list">
@@ -585,6 +625,12 @@
               <button class="start-menu-item" type="button" data-launch="paint">
                 <span class="desktop-icon-glyph desktop-icon-glyph--paint" aria-hidden="true"></span>
                 그림판
+              </button>
+            </li>
+            <li>
+              <button class="start-menu-item" type="button" data-launch="minesweeper">
+                <span class="desktop-icon-glyph desktop-icon-glyph--mine" aria-hidden="true"></span>
+                지뢰 찾기
               </button>
             </li>
             <li>
@@ -625,5 +671,6 @@
     <script type="module" src="window-manager.js"></script>
     <script type="module" src="paint-app.js"></script>
     <script type="module" src="doom-app.js"></script>
+    <script type="module" src="minesweeper-ui.js"></script>
   </body>
 </html>
