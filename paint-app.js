@@ -26,7 +26,10 @@ import {
 } from "./pixel-transport.js";
 import { createParticle, stepParticles, applySeparation, settledRatio } from "./particle-flow.js";
 
-const TARGET_IMAGE = "a.jpg";
+const TARGET_IMAGE = "images.jpeg";
+// 목표 사진의 흰 배경은 자리에서 뺀다 — 안 그러면 픽셀이 네모난 덩어리로
+// 퍼져서 그림이 아니라 사각형이 된다.
+const TARGET_MAX_LUMINANCE = 0.9;
 // 목표 자리 수. 화면에 필요한 것보다 넉넉해야 획이 늘어도 사진이 촘촘해진다.
 const MAX_SLOTS = 9000;
 const MAX_PARTICLES = 9000;
@@ -34,6 +37,8 @@ const MAX_PARTICLES = 9000;
 const IMPROVE_PER_FRAME = 900;
 // 획을 그은 뒤 배정을 다시 계산하기까지의 여유(ms).
 const REASSIGN_DELAY = 180;
+// 0이면 그린 색을 그대로 둔다 — 자리만 옮겨서 형태로만 사진을 만든다.
+const COLOR_BLEND = 0;
 
 const card = document.querySelector('.window-card[data-window="paint"]');
 const canvas = card && card.querySelector(".paint-canvas");
@@ -117,7 +122,7 @@ if (canvas) {
       bufferContext.drawImage(image, 0, 0, width, height);
 
       const imageData = bufferContext.getImageData(0, 0, width, height);
-      slots = buildTargetSlots(imageData, { maxSlots: MAX_SLOTS });
+      slots = buildTargetSlots(imageData, { maxSlots: MAX_SLOTS, maxLuminance: TARGET_MAX_LUMINANCE });
       slotsReady = slots.length > 0;
       targetAspect = width / height;
       scheduleReassign(0);
@@ -159,9 +164,8 @@ if (canvas) {
       const particle = particles[i];
       particle.tx = frame.x + slot.x * frame.width;
       particle.ty = frame.y + slot.y * frame.height;
-      particle.tr = slot.r;
-      particle.tg = slot.g;
-      particle.tb = slot.b;
+      // 색은 건드리지 않는다. 그린 색 그대로 두고 자리만 옮겨서, 사진은
+      // 형태(밝기 분포)로만 드러난다.
     }
   }
 
@@ -295,7 +299,7 @@ if (canvas) {
     }
 
     applySeparation(particles, { dt: Math.min(dt, 1 / 30) });
-    stepParticles(particles, dt);
+    stepParticles(particles, dt, { colorBlend: COLOR_BLEND });
     renderParticles();
 
     // 다 모였고 그리는 중도 아니면 루프를 멈춘다.
