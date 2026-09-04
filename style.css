@@ -1110,6 +1110,20 @@ button {
   border: 1px solid #7a8fa3;
 }
 
+#windows .desktop-icon-glyph--mine {
+  background: linear-gradient(180deg, #f2f4f6, #c9d2da);
+  border: 1px solid #7d8b98;
+}
+
+/* 아이콘 위의 작은 지뢰 — 검은 원에 하이라이트. */
+#windows .desktop-icon-glyph--mine::after {
+  content: "";
+  position: absolute;
+  inset: 6px 9px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #6f7d8a, #14181c 70%);
+}
+
 #windows .desktop-icon-glyph--cpanel {
   background: radial-gradient(circle at 35% 30%, #e6c8ff, #a066d6 65%, #6b3fa0);
   border: 1px solid #6b3fa0;
@@ -1208,6 +1222,15 @@ button {
   height: 52%;
   --win7-theme-color: rgba(178, 235, 200, 0.65);
   --win7-theme-color-inactive: rgba(178, 235, 200, 0.3);
+}
+
+#windows .window-card--minesweeper {
+  left: 30%;
+  top: 30%;
+  width: 20%;
+  height: 54%;
+  --win7-theme-color: rgba(205, 224, 245, 0.68);
+  --win7-theme-color-inactive: rgba(205, 224, 245, 0.32);
 }
 
 #windows .window-card--cpanel {
@@ -1891,4 +1914,186 @@ button {
 
 #windows .explorer-preview.is-ready .explorer-preview-hint {
   opacity: 0.75;
+}
+
+
+/* ── 창 5: 지뢰 찾기 ───────────────────────────────────────────────── */
+
+#windows .mine-body {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 8px;
+  background-color: #d4d0c8;
+  font-size: 13px;
+}
+
+/* 위쪽 상태 줄 — 남은 지뢰 / 리셋 / 경과 시간. 진짜 게임처럼 파인 테두리. */
+#windows .mine-hud {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 6px;
+  border: 2px solid;
+  border-color: #808080 #ffffff #ffffff #808080;
+  background: #d4d0c8;
+}
+
+#windows .mine-counter,
+#windows .mine-timer {
+  padding: 2px 5px;
+  border: 1px solid #808080;
+  background: #202020;
+  color: #ff3b30;
+  font-family: "Courier New", monospace;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  line-height: 1.1;
+}
+
+#windows .mine-reset {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 2px solid;
+  border-color: #ffffff #808080 #808080 #ffffff;
+  background: #d4d0c8;
+  cursor: pointer;
+}
+
+#windows .mine-reset:active {
+  border-color: #808080 #ffffff #ffffff #808080;
+}
+
+/* 얼굴은 이모지 대신 CSS로 그린다 — 폰트에 따라 모양이 흔들리지 않게. */
+#windows .mine-face {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe98a, #f2c200 70%);
+  border: 1px solid #9a7c00;
+}
+
+#windows .mine-face::before,
+#windows .mine-face::after {
+  content: "";
+  position: absolute;
+  background: #3a2f00;
+}
+
+#windows .mine-face::before {
+  top: 5px;
+  left: 4px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  box-shadow: 7px 0 0 #3a2f00;
+}
+
+#windows .mine-face::after {
+  bottom: 4px;
+  left: 4px;
+  width: 9px;
+  height: 3px;
+  border-radius: 0 0 6px 6px;
+}
+
+/* 이겼을 땐 웃는 입이 커지고, 졌을 땐 뒤집힌다. */
+#windows .window-card.is-won .mine-face::after {
+  bottom: 3px;
+  height: 5px;
+}
+
+#windows .window-card.is-lost .mine-face::after {
+  bottom: 3px;
+  height: 4px;
+  border-radius: 6px 6px 0 0;
+}
+
+#windows .mine-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--mine-cols, 9), 1fr);
+  gap: 1px;
+  padding: 3px;
+  border: 2px solid;
+  border-color: #808080 #ffffff #ffffff #808080;
+  background: #b8b4ac;
+}
+
+#windows .mine-cell {
+  aspect-ratio: 1;
+  min-width: 0;
+  padding: 0;
+  border: 2px solid;
+  border-color: #ffffff #808080 #808080 #ffffff;
+  background: #d4d0c8;
+  font: inherit;
+  font-weight: 700;
+  font-size: clamp(9px, 1.4vw, 15px);
+  line-height: 1;
+  cursor: pointer;
+}
+
+#windows .mine-cell.is-revealed {
+  border: 1px solid #b0aca4;
+  background: #cfcbc3;
+  cursor: default;
+}
+
+/* 숫자 색은 원본 규칙 그대로 — 1은 파랑, 2는 초록, 3은 빨강... */
+#windows .mine-cell[data-adjacent="1"] {
+  color: #1414d2;
+}
+#windows .mine-cell[data-adjacent="2"] {
+  color: #157a15;
+}
+#windows .mine-cell[data-adjacent="3"] {
+  color: #d21414;
+}
+#windows .mine-cell[data-adjacent="4"] {
+  color: #14147a;
+}
+#windows .mine-cell[data-adjacent="5"] {
+  color: #7a1414;
+}
+#windows .mine-cell[data-adjacent="6"] {
+  color: #147a7a;
+}
+#windows .mine-cell[data-adjacent="7"] {
+  color: #202020;
+}
+#windows .mine-cell[data-adjacent="8"] {
+  color: #6b6b6b;
+}
+
+#windows .mine-cell.is-flagged::after {
+  content: "";
+  display: block;
+  width: 60%;
+  height: 60%;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #d21414 0 55%, #202020 55% 100%);
+  clip-path: polygon(15% 0, 100% 30%, 15% 55%, 15% 100%, 0 100%, 0 0);
+}
+
+#windows .mine-cell.is-mine::after {
+  content: "";
+  display: block;
+  width: 62%;
+  height: 62%;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #7d8a97, #14181c 70%);
+}
+
+#windows .mine-cell.is-exploded {
+  background: #d21414;
 }
