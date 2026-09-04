@@ -2264,3 +2264,182 @@ button {
 #windows .mine-cell.is-exploded {
   background: #d21414;
 }
+
+
+/* ── 부팅 연출 ─────────────────────────────────────────────────────── */
+
+/* 작업표시줄(100)과 시작 메뉴(101)보다 위에 덮는다. */
+#windows .boot-sequence {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  background: #000;
+  color: #dbe9f7;
+  opacity: 1;
+  transition: opacity 0.7s ease;
+}
+
+#windows .boot-sequence[hidden] {
+  display: none;
+}
+
+#windows .boot-sequence.is-finishing {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#windows .boot-screen {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 28px;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+#windows .boot-sequence[data-stage="boot"] .boot-screen--boot,
+#windows .boot-sequence[data-stage="logon"] .boot-screen--logon,
+#windows .boot-sequence[data-stage="welcome"] .boot-screen--logon {
+  opacity: 1;
+}
+
+#windows .boot-screen--logon {
+  background: radial-gradient(circle at 50% 35%, #3d7fc1, #12365e 70%, #0a1f38);
+}
+
+/* 네 조각이 모여 창 로고가 되는 그 장면. */
+#windows .boot-logo {
+  display: grid;
+  grid-template-columns: repeat(2, 34px);
+  grid-template-rows: repeat(2, 34px);
+  gap: 4px;
+  transform: perspective(320px) rotateX(18deg);
+}
+
+#windows .boot-pane {
+  border-radius: 3px;
+  opacity: 0;
+  animation: boot-pane-in 2.2s ease-out forwards;
+  box-shadow: 0 0 18px currentColor;
+}
+
+#windows .boot-pane--red {
+  color: #ff6a4d;
+  background: linear-gradient(160deg, #ff8f77, #d93b1a);
+  animation-delay: 0.1s;
+}
+#windows .boot-pane--green {
+  color: #74d96b;
+  background: linear-gradient(160deg, #a5ef9c, #3fa832);
+  animation-delay: 0.35s;
+}
+#windows .boot-pane--blue {
+  color: #61b7ff;
+  background: linear-gradient(160deg, #9ad6ff, #1f7ad4);
+  animation-delay: 0.6s;
+}
+#windows .boot-pane--yellow {
+  color: #ffd15c;
+  background: linear-gradient(160deg, #ffe79a, #e0a410);
+  animation-delay: 0.85s;
+}
+
+@keyframes boot-pane-in {
+  0% {
+    opacity: 0;
+    transform: translate(var(--from-x, 0), 26px) scale(0.6);
+  }
+  60% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+#windows .boot-caption {
+  margin: 0;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  opacity: 0;
+  animation: boot-fade-in 1s ease-out 1.2s forwards;
+}
+
+@keyframes boot-fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+#windows .logon-card {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  color: #eaf4ff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+#windows .logon-avatar {
+  width: 96px;
+  height: 96px;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  border-radius: 6px;
+  background:
+    radial-gradient(circle at 50% 34%, #ffe0bd 0 18%, transparent 19%),
+    radial-gradient(ellipse at 50% 88%, #ffe0bd 0 32%, transparent 33%),
+    linear-gradient(180deg, #7fb2e5, #2f6fae);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+#windows .logon-name {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+#windows .logon-status {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+/* welcome 단계에서만 도는 고리 — 로그온 직후의 그 대기 표시. */
+#windows .logon-spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+#windows .boot-sequence[data-stage="welcome"] .logon-spinner {
+  opacity: 1;
+  animation: logon-spin 0.9s linear infinite;
+}
+
+@keyframes logon-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+#windows .boot-skip {
+  position: absolute;
+  right: 16px;
+  bottom: 14px;
+  margin: 0;
+  font-size: 11px;
+  color: rgba(220, 235, 250, 0.55);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #windows .boot-sequence {
+    display: none;
+  }
+}
