@@ -12,6 +12,10 @@ import {
   moveWindow,
   renameWindow,
   resizeDesktop,
+  setRect,
+  maximizeWindow,
+  snapZoneFor,
+  snapRect,
   activeWindowId,
   taskbarItems,
   zIndexOf,
@@ -27,6 +31,8 @@ const DESKTOP_QUERY = "(min-width: 769px)";
 const section = document.getElementById("windows");
 const desktopEl = section && section.querySelector(".desktop");
 const taskbarButtons = section && section.querySelector(".taskbar-buttons");
+const snapPreview = section && section.querySelector(".snap-preview");
+const peek = section && section.querySelector(".taskbar-peek");
 const startOrb = section && section.querySelector(".start-orb");
 const startMenu = section && section.querySelector(".start-menu");
 const clockEl = section && section.querySelector(".taskbar-clock");
@@ -96,7 +102,14 @@ function renderTaskbar() {
       button.type = "button";
       button.className = "taskbar-button";
       button.dataset.window = item.id;
-      button.addEventListener("click", () => setState(toggleMinimize(state, item.id)));
+      button.addEventListener("click", () => {
+        hidePeek();
+        setState(toggleMinimize(state, item.id));
+      });
+      button.addEventListener("pointerenter", () => showPeek(item.id, button));
+      button.addEventListener("pointerleave", hidePeek);
+      button.addEventListener("focus", () => showPeek(item.id, button));
+      button.addEventListener("blur", hidePeek);
       taskbarButtons.appendChild(button);
     }
     existing.delete(item.id);
@@ -107,7 +120,10 @@ function renderTaskbar() {
   }
 
   // 닫힌 창의 버튼은 사라진다.
-  for (const leftover of existing.values()) leftover.remove();
+  for (const leftover of existing.values()) {
+    leftover.remove();
+    hidePeek();
+  }
 }
 
 function render(previous) {
@@ -142,6 +158,48 @@ function render(previous) {
   renderTaskbar();
 }
 
+// 놓으면 창이 갈 자리를 반투명 사각형으로 미리 보여준다.
+function showSnapPreview(zone) {
+  if (!snapPreview) return;
+  const rect = state ? snapRect(zone, state.desktop) : null;
+  if (!rect) {
+    snapPreview.hidden = true;
+    return;
+  }
+  snapPreview.style.left = `${rect.x}px`;
+  snapPreview.style.top = `${rect.y}px`;
+  snapPreview.style.width = `${rect.width}px`;
+  snapPreview.style.height = `${rect.height}px`;
+  snapPreview.hidden = false;
+}
+
+// 작업표시줄 버튼에 마우스를 올리면 뜨는 작은 카드(Aero Peek 흉내).
+// 실제 창 썸네일 대신 제목과 그 창의 유리색으로 만든 미니 프레임을 보여준다.
+function showPeek(id, button) {
+  if (!peek || !state.windows[id]) return;
+  const target = state.windows[id];
+  peek.querySelector(".taskbar-peek-title").textContent = target.title;
+  peek.querySelector(".taskbar-peek-state").textContent = target.minimized ? "최소화됨" : "열려 있음";
+
+  const card = cards.get(id);
+  const frame = peek.querySelector(".taskbar-peek-frame");
+  if (card && frame) {
+    const glass = getComputedStyle(card).getPropertyValue("--win7-theme-color").trim();
+    frame.style.background = glass || "";
+  }
+
+  peek.hidden = false;
+  const buttonRect = button.getBoundingClientRect();
+  const sectionRect = section.getBoundingClientRect();
+  const width = peek.offsetWidth;
+  const left = buttonRect.left - sectionRect.left + buttonRect.width / 2 - width / 2;
+  peek.style.left = `${Math.max(6, Math.min(left, sectionRect.width - width - 6))}px`;
+}
+
+function hidePeek() {
+  if (peek) peek.hidden = true;
+}
+
 function startDrag(card, id, event) {
   // 버튼 위에서 시작한 드래그는 무시 — 그건 클릭이다.
   if (event.button !== 0 || event.target.closest(".win-btn")) return;
@@ -159,7 +217,16 @@ function startDrag(card, id, event) {
   card.setPointerCapture(event.pointerId);
   card.classList.add("is-dragging");
 
+  let zone = null;
+
   const onMove = (moveEvent) => {
+    const pointer = {
+      x: moveEvent.clientX - desktopRect.left,
+      y: moveEvent.clientY - desktopRect.top,
+    };
+    // 가장자리에 닿으면 놓았을 때 어디에 붙을지 먼저 보여준다.
+    zone = snapZoneFor(pointer, state.desktop);
+    showSnapPreview(zone);
     setState(
       moveWindow(state, id, {
         x: moveEvent.clientX - desktopRect.left - offsetX,
@@ -170,6 +237,10 @@ function startDrag(card, id, event) {
 
   const onUp = () => {
     card.classList.remove("is-dragging");
+    showSnapPreview(null);
+    if (zone === "top") setState(maximizeWindow(state, id));
+    else if (zone) setState(setRect(state, id, snapRect(zone, state.desktop)));
+    zone = null;
     card.removeEventListener("pointermove", onMove);
     card.removeEventListener("pointerup", onUp);
     card.removeEventListener("pointercancel", onUp);
@@ -316,6 +387,8 @@ function enable() {
 }
 
 function disable() {
+  hidePeek();
+  showSnapPreview(null);
   resizeObserver?.disconnect();
   resizeObserver = null;
   state = null;
